@@ -1,0 +1,26 @@
+#! /usr/bin/bash
+
+# Check if at least two arguments are provided (Here &2 means stderr)
+if [ "$#" -lt 2 ]; then
+    echo "Usage: combine outputfilename [inputfilename ...]" >&2
+    exit 1
+fi
+
+# Assign output file name
+f1="$1"
+
+
+# Check if the output file already exists
+if [ -e "$f1" ]; then
+    echo "Error: Output file should not exist" >&2
+    exit 1
+fi
+
+# Process input files and concatenate their contents into the output file
+for file in "$@"; do
+    if [ "$file" != "$f1" ];then
+        cat "$file" >> "$f1" 2>>"$f1"   # Redirect errors to output file
+    fi
+done
+
+exit 0

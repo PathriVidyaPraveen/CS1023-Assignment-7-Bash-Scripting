@@ -1,0 +1,36 @@
+#! /usr/bin/bash
+
+reg_exp="$1"
+default_file="words"
+if [ -z "$2" ];then 
+    file="$default_file"
+else
+    file="$2"
+fi 
+# if [ ! -f "$file" ]; then
+#     echo "Error: File '$file' not found." >&2
+#     exit 1
+# fi
+if [ ! -f "$file" ] 2>/dev/null; then
+    echo "Error: File '$file' not found." >/dev/null 2>&1
+    exit 1
+fi
+
+# words_list=$(grep -E '\w*'"$reg_exp"'\w*' "$file" 2>/dev/null | sort -u)
+words_list=$(grep -Ei '\w*'"$reg_exp"'\w*' "$file" 2>/dev/null | sort -fu 2>/dev/null)
+
+index=1
+for matched_word in $words_list; do
+    if [ "$index" -lt 4 ]; then
+        echo -n "$matched_word       "
+        ((index++))
+    else
+        echo "$matched_word       "
+        index=1
+    fi
+done
+
+# Add a final newline if needed
+if [ "$index" -ne 1 ]; then
+    echo
+fi

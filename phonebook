@@ -1,0 +1,48 @@
+#! /usr/bin/bash
+
+
+command="$1"
+
+if [ "$command" = "new" ]; then
+
+    name="$2"
+    number="$3"
+    echo "$name $number" >> phonebook.txt
+
+fi
+
+if [ "$command" = "list" ]; then
+
+    if [ ! -s "phonebook.txt" ]; then
+        echo "phonebook is empty"
+    else
+        cat phonebook.txt
+    fi
+
+fi
+
+if [ "$command" = "clear" ]; then
+    rm -f phonebook.txt
+fi
+
+
+if [ "$command" = "remove" ];then
+    touch "filtered.txt"
+    name="$2"
+    escaped_name=$(echo "$name" | sed 's/[]\/$*.^[]/\\&/g')
+    grep -v "^$escaped_name[[:space:]]" phonebook.txt > filtered.txt
+
+    mv "filtered.txt" "phonebook.txt"
+    echo "All the entries of the name $name are removed from the phonebook"
+
+fi
+
+if [ "$command" = "lookup" ];then
+    name="$2"
+    # while read -r line;do
+    #     if [[ $(echo "$line" | awk '{print $1}') == "$name" ]];then
+    #         echo "$(echo "$line" | awk '{print $NF}')"
+    #     fi
+    # done < "phonebook.txt"
+    grep "^$name " phonebook.txt | awk '{print $NF}'
+fi

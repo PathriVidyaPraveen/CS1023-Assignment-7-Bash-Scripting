@@ -1,0 +1,8 @@
+#! /usr/bin/bash
+datep(){
+    read -r weekday Month Date Time timeStandard Year <<< "$(date)"
+    echo "$Month $Date, $Year"
+}
+export -f  datep
+exec bash
+

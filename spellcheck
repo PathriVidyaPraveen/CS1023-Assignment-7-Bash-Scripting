@@ -1,0 +1,48 @@
+#! /usr/bin/bash
+
+dictionary="/usr/share/dict/words"  # System dictionary (change if using a different one)
+
+# Check if arguments are provided
+if [ $# -eq 0 ]; then
+    echo "Usage: spellcheck filename" >&2
+    exit 1
+fi
+
+# Process each file argument
+for file in "$@"; do
+    if [ ! -f "$file" ]; then
+        echo "Error: '$file' is not a valid file. Moving on to the next file..." >&2
+        continue
+    fi
+
+    destination_file="${file}.spelling"
+
+    if [ -f "$destination_file" ]; then
+        echo "Deleting old spelling file '$destination_file' and replacing it."
+        rm -f "$destination_file"
+    else
+        echo "Creating spelling file '$destination_file'."
+    fi
+
+    wordCount=0
+    uniqueWordCount=0
+    declare -A wordMap  # Associative array to track unique words
+
+    while read -r word; do
+        word=$(echo "$word" | tr -d '[:punct:]' | tr '[:upper:]' '[:lower:]')  
+        if [[ -n "$word" ]]; then
+            ((wordCount++))
+            if ! grep -iqx "$word" "$dictionary"; then
+                if [[ -z "${wordMap[$word]}" ]]; then
+                    wordMap[$word]=1
+                    ((uniqueWordCount++))
+                    echo "$word" >> "$destination_file"
+                fi
+            fi
+        fi
+    done < <(tr -s '[:space:]' '\n' < "$file")
+
+    echo "File '$file' is completely processed. Total words checked: $wordCount, Unique words: $uniqueWordCount"
+done
+
+exit 0
